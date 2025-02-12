@@ -5,7 +5,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -21,7 +23,36 @@ public class DevInitData {
     ApplicationRunner devApplicationRunner() {
         return args -> {
             genApiJsonFile("http://localhost:8080/v3/api-docs/apiV1", "apiV1.json");
+            runCmdJsonToTs();
         };
+    }
+
+    public void runCmdJsonToTs() {
+        String[] command = {
+                "npx", "--package", "typescript",
+                "--package", "openapi-typescript",
+                "--package", "punycode",
+                "openapi-typescript", "apiV1.json", "-o", "schema.d.ts"
+        };
+
+        ProcessBuilder processBuilder = new ProcessBuilder(command);
+        processBuilder.redirectErrorStream(true); // 표준 에러 출력도 읽기 위해 설정
+
+        try {
+            Process process = processBuilder.start();
+            BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+
+            String line;
+            while ((line = reader.readLine()) != null) {
+                System.out.println(line); // 터미널 출력 내용 확인
+            }
+
+            int exitCode = process.waitFor();
+            System.out.println("프로세스 종료 코드: " + exitCode);
+
+        } catch (IOException | InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
     public void genApiJsonFile(String url, String filename) throws Exception {
