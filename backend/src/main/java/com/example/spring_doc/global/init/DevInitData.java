@@ -5,6 +5,14 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 
+import java.io.IOException;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.nio.file.Files;
+import java.nio.file.Path;
+
 @Profile("dev")
 @Configuration
 public class DevInitData {
@@ -12,7 +20,37 @@ public class DevInitData {
     @Bean
     ApplicationRunner devApplicationRunner() {
         return args -> {
-            System.out.println("dev Application runner");
+            genApiJsonFile("http://localhost:8080/v3/api-docs/apiV1", "apiV1.json");
         };
+    }
+
+    public void genApiJsonFile(String url, String filename) throws Exception {
+        Path outputFile = Path.of(filename); // 저장할 파일 경로
+
+        try {
+            // HttpClient 생성
+            HttpClient client = HttpClient.newHttpClient();
+
+            // GET 요청 생성
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(URI.create(url))
+                    .GET()
+                    .build();
+
+            // 요청 실행 및 응답 받기
+            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+
+            // 응답 코드 확인 (200 OK)
+            if (response.statusCode() == 200) {
+                // JSON 데이터를 파일로 저장
+                Files.writeString(outputFile, response.body());
+                System.out.println("JSON 파일 저장 완료: " + outputFile.toAbsolutePath());
+            } else {
+                System.err.println("오류: HTTP 응답 코드 " + response.statusCode());
+            }
+
+        } catch (IOException | InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 }
