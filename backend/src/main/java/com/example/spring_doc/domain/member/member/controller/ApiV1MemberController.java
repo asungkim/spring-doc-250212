@@ -7,6 +7,7 @@ import com.example.spring_doc.global.Rq;
 import com.example.spring_doc.global.dto.RsData;
 import com.example.spring_doc.global.exception.ServiceException;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
@@ -14,6 +15,7 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
+@SecurityRequirement(name = "bearerAuth")
 @Tag(name = "ApiV1MemberController", description = "회원 관련 API")
 @RestController
 @RequestMapping("/api/v1/members")
@@ -54,7 +56,7 @@ public class ApiV1MemberController {
     record LoginResBody(MemberDto item, String apiKey, String accessToken) {
     }
 
-    @Operation(summary = "로그인",description = "로그인 성공 시 ApiKey와 AccessToken 반환. 쿠키로도 반환")
+    @Operation(summary = "로그인", description = "로그인 성공 시 ApiKey와 AccessToken 반환. 쿠키로도 반환")
     @PostMapping("/login")
     public RsData<LoginResBody> login(@Valid @RequestBody LoginReqBody body, HttpServletResponse response) {
         Member member = memberService.findByUsername(body.username()).orElseThrow(
@@ -80,7 +82,7 @@ public class ApiV1MemberController {
         );
     }
 
-    @Operation(summary = "로그아웃",description = "로그아웃 시 쿠키 삭제")
+    @Operation(summary = "로그아웃", description = "로그아웃 시 쿠키 삭제")
     @DeleteMapping("/logout")
     public RsData<Void> logout() {
         rq.removeCookie("accessToken");
@@ -90,6 +92,7 @@ public class ApiV1MemberController {
     }
 
 
+    @SecurityRequirement(name = "bearerAuth")
     @Operation(summary = "내 정보 조회")
     @GetMapping("/me")
     public RsData<MemberDto> me() {
