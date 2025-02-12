@@ -65,7 +65,7 @@ public class ApiV1PostController {
     @Transactional(readOnly = true)
     public RsData<PageDto> getItems(@RequestParam(defaultValue = "1") int page,
                                     @RequestParam(defaultValue = "3") int pageSize,
-                                    @RequestParam(defaultValue = "title") String keywordType,
+                                    @RequestParam(defaultValue = "title") SearchKeywordType keywordType,
                                     @RequestParam(defaultValue = "") String keyword) {
         Page<Post> postPage = postService.getListedItems(page, pageSize, keywordType, keyword);
 
@@ -85,11 +85,11 @@ public class ApiV1PostController {
     public RsData<PageDto> getMines(
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "3") int pageSize,
-            @RequestParam(defaultValue = "title") String keywordType,
+            @RequestParam(defaultValue = "title") SearchKeywordType keywordType,
             @RequestParam(defaultValue = "") String keyword) {
 
         Member actor = rq.getActor();
-        Page<Post> pagePost = postService.getMines(actor, page, pageSize, keywordType, keyword);
+        Page<Post> pagePost = postService.getMines(actor, page, pageSize, SearchKeywordType.TITLE, keyword);
 
         return new RsData<>(
                 "200-1",
