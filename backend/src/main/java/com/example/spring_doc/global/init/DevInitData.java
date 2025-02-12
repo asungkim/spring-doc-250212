@@ -14,6 +14,8 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Arrays;
+import java.util.List;
 
 @Profile("dev")
 @Configuration
@@ -23,19 +25,14 @@ public class DevInitData {
     ApplicationRunner devApplicationRunner() {
         return args -> {
             genApiJsonFile("http://localhost:8080/v3/api-docs/apiV1", "apiV1.json");
-            runCmdJsonToTs();
+            runCmdJsonToTs("npx --package typescript --package openapi-typescript --package punycode openapi-typescript apiV1.json -o ../frontend/src/lib/backend/apiV1schema.d.ts");
         };
     }
 
-    public void runCmdJsonToTs() {
-        String[] command = {
-                "npx", "--package", "typescript",
-                "--package", "openapi-typescript",
-                "--package", "punycode",
-                "openapi-typescript", "apiV1.json", "-o", "schema.d.ts"
-        };
+    public void runCmdJsonToTs(String command) {
+        List<String> commandList = Arrays.asList(command.split(" ")); // 공백 기준으로 분할
 
-        ProcessBuilder processBuilder = new ProcessBuilder(command);
+        ProcessBuilder processBuilder = new ProcessBuilder(commandList);
         processBuilder.redirectErrorStream(true); // 표준 에러 출력도 읽기 위해 설정
 
         try {
