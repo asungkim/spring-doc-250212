@@ -1,6 +1,7 @@
 server:
   port: 8080
 
+
 spring:
   output:
     ansi:
@@ -42,3 +43,7 @@ custom:
   jwt:
     secret-key: abcdefghijklmnopqrstuvwxyz1234567890abcdefghijklmnopqrstuvwxyz1234567890
     expire-seconds: "#{5}"
+
+
+springdoc:
+  default-produces-media-type: application/json:charset=UTF-8
