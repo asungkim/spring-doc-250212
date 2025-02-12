@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class HomeController {
 
     @Operation(summary = "API 서버 시작페이지", description = "API 서버 시작페이지입니다. api 호출은 인증 해주세요.")
-    @GetMapping("/")
+    @GetMapping(value = "/", produces = "text/plain;charset=UTF-8")
     public String home() {
         return "API 서버에 오신 것을 환영합니다.";
     }
